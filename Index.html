@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generador de URL e Iframe</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+        /* Estilos CSS existentes */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111; /* Fondo negro */
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.5s; /* Animación de cambio de fondo */
+        }
+
+        .container {
+            background-color: #111; /* Fondo oscuro */
+            border: 2px solid #303030;
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+        }
+
+        h1 {
+            color: #ff0000; /* Rojo */
+            font-size: 24px;
+        }
+
+        label {
+            color: #ff0000; /* Rojo */
+            display: block;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        select {
+            padding: 10px;
+            width: 100%;
+            background-color: #111; /* Fondo oscuro */
+            color: white;
+            border: 1px solid #303030;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+
+        input[type="button"] {
+            padding: 10px 20px;
+            background-color: #ff0000; /* Rojo */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.5s; /* Animación de cambio de color de fondo */
+        }
+
+
+/* Estilos para los botones de configuración y "Acerca de" */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.button-container button {
+ background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 5px 10px; /* Reducir el tamaño del padding */
+    border-radius: 3px; /* Reducir el radio de la esquina */
+    cursor: pointer;
+}
+
+.button-container button:hover {
+    background-color: #d40000; /* Rojo oscuro al pasar el mouse */
+}
+
+.material-icons {
+    font-size: 24px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+
+        input[type="button"]:hover {
+            background-color: #d40000; /* Rojo oscuro al pasar el mouse */
+        }
+
+        .output-container {
+            background-color: #111; /* Fondo oscuro */
+            border: 2px solid #303030;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .output-container p {
+            color: #ff0000; /* Rojo */
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #111; /* Fondo oscuro */
+            color: white;
+            border: 1px solid #303030;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .copy-button {
+            background-color: #ff0000; /* Rojo */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.5s; /* Animación de cambio de color de fondo */
+        }
+
+        .copy-button:hover {
+            background-color: #d40000; /* Rojo oscuro al pasar el mouse */
+        }
+
+        /* Styles for the modal window */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        .modal-content {
+            background-color: #111; /* Fondo oscuro */
+            border: 2px solid #303030;
+            border-radius: 10px;
+            padding: 20px;
+            width: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #ff0000; /* Rojo */
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+
+
+
+/* Estilo base para los botones */
+button {
+    background-color: #ff0000; /* Cambia el color de fondo a tu preferencia */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.small-button {
+    font-size: 14px;
+    padding: 5px;
+}
+
+.small-icon {
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+
+
+/* Estilo para los iconos dentro de los botones */
+.material-icons {
+    font-size: 24px; /* Ajusta el tamaño del ícono según tus preferencias */
+    vertical-align: middle; /* Centra el ícono verticalmente en el botón */
+    margin-right: 5px; /* Espacio entre el ícono y el borde del botón */
+}
+
+/* Estilo específico para el botón de configuración */
+#config-button {
+    background-color: #ff0000; /* Cambia el color de fondo a tu preferencia */
+}
+
+    </style>
+  
+<script>
+function cambiarIdioma(selectedLanguage) {
+   var translations = {
+    "es": {
+        "generate-button": "Generar URL e Iframe",
+        "config-button": "Configuración",
+        "copy-url-button": "Copiar al Portapapeles",
+        "copy-iframe-button": "Copiar al Portapapeles",
+        "url-label": "URL Generada:",
+        "iframe-label": "Código Iframe",
+        "config-title": "Configuración",
+        "api-key-label": "API Drive:",
+        "api-key-input": "Introduzca su API Drive",
+        "vast-url-label": "URL del Anuncio VAST:",
+        "vast-url-input": "Introduzca la URL del anuncio VAST"
+    },
+    "en": {
+        "generate-button": "Generate URL and Iframe",
+        "config-button": "Settings",
+        "copy-url-button": "Copy to Clipboard",
+        "copy-iframe-button": "Copy to Clipboard",
+        "url-label": "Generated URL:",
+        "iframe-label": "Iframe Code",
+        "config-title": "Settings",
+        "api-key-label": "API Key:",
+        "api-key-input": "Enter your API Key",
+        "vast-url-label": "VAST Ad URL:",
+        "vast-url-input": "Enter the VAST ad URL"
+    },
+    "pt": {
+        "generate-button": "Gerar URL e Iframe",
+        "config-button": "Configurações",
+        "copy-url-button": "Copiar para a Área de Transferência",
+        "copy-iframe-button": "Copiar para a Área de Transferência",
+        "url-label": "URL Gerada:",
+        "iframe-label": "Código Iframe",
+        "config-title": "Configurações",
+        "api-key-label": "Chave da API:",
+        "api-key-input": "Insira sua chave da API",
+        "vast-url-label": "URL do Anúncio VAST:",
+        "vast-url-input": "Insira a URL do anúncio VAST"
+    }
+};
+
+
+    function translateElement(key, value) {
+        var element = document.getElementById(key);
+        if (element) {
+            if (element.tagName.toLowerCase() === 'input' && element.type.toLowerCase() === 'button') {
+                element.value = value;
+            } else {
+                element.innerText = value;
+            }
+        }
+    }
+
+    function translateElementsInModal(modalId, language) {
+        var modal = document.getElementById(modalId);
+        if (modal) {
+            var elementsToTranslate = modal.querySelectorAll("[data-translation-key]");
+            elementsToTranslate.forEach(function (element) {
+                var key = element.getAttribute("data-translation-key");
+                if (translations[language] && translations[language][key]) {
+                    translateElement(key, translations[language][key]);
+                }
+            });
+        }
+    }
+
+    if (translations[selectedLanguage]) {
+        for (var key in translations[selectedLanguage]) {
+            if (translations[selectedLanguage].hasOwnProperty(key)) {
+                translateElement(key, translations[selectedLanguage][key]);
+            }
+        }
+
+        // También traduce elementos dentro de configModal
+        translateElementsInModal("configModal", selectedLanguage);
+    }
+}
+    // Función para mostrar la configuración
+    function mostrarConfiguracion() {
+        var modal = document.getElementById("configModal");
+        modal.style.display = "block";
+    }
+
+    // Función para cerrar la configuración
+    function cerrarConfiguracion() {
+        var modal = document.getElementById("configModal");
+        modal.style.display = "none";
+    }
+
+    // Función para guardar la configuración
+    function guardarConfiguracion() {
+        var apiKey = document.getElementById("api_key").value;
+        var vastURL = document.getElementById("vast_url").value;
+        var selectedLanguage = document.getElementById("config-language").value;
+        var selectedLibrary = document.getElementById("library").value;
+
+        localStorage.setItem("api_key", apiKey);
+        localStorage.setItem("vast_url", vastURL);
+        localStorage.setItem("selected_language", selectedLanguage);
+        localStorage.setItem("selected_library", selectedLibrary);
+
+        cerrarConfiguracion();
+        cambiarIdioma(selectedLanguage);
+    }
+
+    // Función para obtener la configuración almacenada
+    function obtenerApiKey() {
+        var apiKey = localStorage.getItem("api_key");
+        var vastURL = localStorage.getItem("vast_url");
+        var selectedLanguage = localStorage.getItem("selected_language");
+        var selectedLibrary = localStorage.getItem("selected_library");
+
+        if (apiKey) {
+            document.getElementById("api_key").value = apiKey;
+        }
+
+        if (vastURL) {
+            document.getElementById("vast_url").value = vastURL;
+        }
+
+        if (selectedLanguage) {
+            document.getElementById("config-language").value = selectedLanguage;
+            cambiarIdioma(selectedLanguage);
+        }
+
+        if (selectedLibrary) {
+            document.getElementById("library").value = selectedLibrary;
+        }
+    }
+function generarURLyIframe() {
+    var id = document.getElementById("id").value;
+    var urlPoster = document.getElementById("url_poster").value;
+    var library = document.getElementById("library").value;
+    var apiKey = document.getElementById("api_key").value;
+    var vastURL = document.getElementById("vast_url").value;
+
+    var baseUrl = window.location.origin;
+
+    var urlGenerada = baseUrl + "/pruebdcjdnskjcnzvkjcd/player.html?id=" + id + "&poster=" + encodeURIComponent(urlPoster) + "&api_key=" + apiKey;
+
+    if (subtitleUrl) {
+        urlGenerada += "&subtitle=" + encodeURIComponent(subtitleUrl); // Agregar la URL del subtítulo si se proporciona
+    }
+
+    if (library === "player2") {
+        urlGenerada = baseUrl + "/pruebdcjdnskjcnzvkjcd/player1.html?id=" + id + "&poster=" + encodeURIComponent(urlPoster) + "&api_key=" + apiKey;
+    }
+
+    if (library === "player3") {
+        urlGenerada = baseUrl + "/pruebdcjdnskjcnzvkjcd/player2.html?id=" + id + "&poster=" + encodeURIComponent(urlPoster) + "&api_key=" + apiKey;
+    }
+
+    if (library === "player4") {
+        urlGenerada = baseUrl + "/pruebdcjdnskjcnzvkjcd/player3.html?id=" + id + "&poster=" + encodeURIComponent(urlPoster) + "&api_key=" + apiKey;
+    }
+
+    document.getElementById("url_generada").value = urlGenerada;
+    var iframeCode = '<iframe width="560" height="315" src="' + urlGenerada + '" title="STPDRIVEPLAYER" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+    document.getElementById("iframe_code").value = iframeCode;
+}
+
+
+ // Función para mostrar la ventana modal "Acerca de"
+    function mostrarAcercaDe() {
+        var modal = document.getElementById("aboutModal");
+        modal.style.display = "block";
+    }
+
+    // Función para cerrar la ventana modal "Acerca de"
+    function cerrarAcercaDe() {
+        var modal = document.getElementById("aboutModal");
+        modal.style.display = "none";
+    }
+
+    function copiarAlPortapapeles(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        document.execCommand("copy");
+        alert("Texto copiado al portapapeles: " + copyText.value);
+    }
+
+    // Llama a esta función para obtener la configuración al cargar la página
+    obtenerApiKey();
+</script>
+
+
+</head>
+<body>
+<body onload="obtenerApiKey()">
+    <div class="container">
+        <h1 id="title"><img src="https://i.ibb.co/M7xPK5S/image-removebg-preview-5.png" alt="Título con imagen" style="width: 300px; height: 80px;"></h1>
+        <label id="id-label" for="id">ID:</label>
+        <input type="text" id="id" required>
+        
+        <label id="url-poster-label" for="url_poster">URL del Póster:</label>
+        <input type="url" id="url_poster" required>
+
+
+
+        <input type="button" value="Generar URL e Iframe" id="generate-button" onclick="generarURLyIframe()">
+        <button id="config-button" class="custom-button" onclick="mostrarConfiguracion()">
+        <i class="material-icons">settings</i>
+        Configuración
+    </button>
+
+<button id="about-button" class="small-button" onclick="mostrarAcercaDe()">
+    <i class="material-icons small-icon">info</i>
+</button>
+
+
+        <div class="output-container">
+            <p id="url-label">URL Generada:</p>
+            <textarea id="url_generada" rows="4" readonly></textarea>
+            <button class="copy-button" id="copy-url-button" onclick="copiarAlPortapapeles('url_generada')">Copiar al Portapapeles</button>
+        </div>
+
+        <div class="output-container">
+            <p id="iframe-label">Código Iframe:</p>
+            <textarea id="iframe_code" rows="4" readonly></textarea>
+            <button class="copy-button" id="copy-iframe-button" onclick="copiarAlPortapapeles('iframe_code')">Copiar al Portapapeles</button>
+        </div>
+    </div>
+<!-- Modal window for configuration -->
+<div id="configModal" class="modal">
+    <div class="modal-content">
+        <button class="close-button" onclick="cerrarConfiguracion()">&times;</button>
+        <h2 data-translation-key="config-title">Configuración</h2>
+        <label for="api_key" data-translation-key="api-key-label">API Drive:</label>
+        <input type="text" id="api_key">
+        
+        <!-- Agrega un campo para la URL del anuncio VAST -->
+        <label for="vast_url" data-translation-key="vast-url-label">URL del Anuncio VAST:</label>
+        <input type="url" id="vast_url">
+      
+        <div class="language-container">
+            <label for="config-language" data-translation-key="language-label">Idioma:</label>
+            <select id="config-language">
+                <option value="es" data-translation-key="spanish">Español</option>
+                <option value="en" data-translation-key="english">Inglés</option>
+                <option value="pt" data-translation-key="portuguese">Portugués</option>
+            </select>
+        </div>
+        
+        <label for="library" data-translation-key="library-label">Reproductor:</label>
+        <select id="library" name="library">
+            <option value="player1" data-translation-key="video-js">Video JS</option>
+            <option value="player2" data-translation-key="fluid-player">Fluid Player</option>
+            <option value="player3" data-translation-key="plyr">Plyr</option>
+        </select>
+        
+        <input type="button" value="Guardar" onclick="guardarConfiguracion()" data-translation-key="save-button">
+    </div>
+</div>
+
+<!-- Modal window for "Acerca de" -->
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <button class="close-button" onclick="cerrarAcercaDe()">&times;</button>
+        <img src="https://i.ibb.co/z6t6sxj/THESTHIPOFICIAL-1-removebg-preview.png" alt="Logo" style="width: 100px; height: 100px;">
+        <h2>Acerca de</h2>
+        <p>Stpdriveplayer es una innovadora herramienta diseñada para simplificar la integración de videos almacenados en Google Drive en diversas bibliotecas de reproducción de video, como FluidPlayer, Video.js y Plyr.</p>
+        <p>Desarrollado por The sthip Oficial</p>
+    </div>
+</div>
+
+
+</body>
+</html>

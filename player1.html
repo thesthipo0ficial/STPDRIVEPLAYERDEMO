@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reproductor de Video con Fluid Player</title>
+    <link rel="stylesheet" href="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.css">
+    <script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #my-video-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #my-video {
+            max-width: 100%;
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            #my-video-container {
+                /* Puedes agregar estilos específicos para dispositivos móviles aquí */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="my-video-container">
+        <video id="my-video" class="fluid-player" controls data-setup='{}'>
+            <!-- Aquí puedes agregar múltiples fuentes de video compatibles con códecs de audio -->
+            <source src="" type="video/mp4" codecs="avc1.42E01E mp4a.40.2" />
+            <source src="" type="video/mkv" codecs="avc1.42E01E ac-3" />
+            <source src="" type="video/avi" codecs="xvid ac3" />
+        </video>
+    </div>
+
+    <!-- Agrega un botón para cambiar la calidad del video -->
+    <div id="quality-selector">
+        <label for="quality">Cambiar calidad:</label>
+        <select id="quality">
+            <option value="high">Alta calidad</option>
+            <option value="medium">Calidad media</option>
+            <option value="low">Baja calidad</option>
+        </select>
+    </div>
+
+    <script>
+        const videoPlayer = fluidPlayer('my-video');
+
+        function obtenerParametroDeURL(nombre) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(nombre);
+        }
+
+        // Obtener el video ID, la API key y el póster de la URL
+        const videoID = obtenerParametroDeURL("id");
+        const apiKey = obtenerParametroDeURL("api_key");
+        const posterURL = obtenerParametroDeURL("poster");
+
+        if (videoID && apiKey) { // Comprobar si tanto el videoID como la apiKey están presentes
+            const videoURL = `https://www.googleapis.com/drive/v3/files/${videoID}?alt=media&key=${apiKey}`;
+            const videoPlayerElement = document.getElementById("my-video");
+
+            // Agregar las fuentes de video con códecs de audio
+            videoPlayerElement.querySelector('source[type="video/mp4"]').src = videoURL + "&mimeType=video/mp4&codecs=avc1.42E01E,mp4a.40.2";
+            videoPlayerElement.querySelector('source[type="video/mkv"]').src = videoURL + "&mimeType=video/x-matroska&codecs=avc1.42E01E,ac-3";
+            videoPlayerElement.querySelector('source[type="video/avi"]').src = videoURL + "&mimeType=video/x-msvideo&codecs=xvid,ac3";
+
+            // Cargar el video
+            videoPlayerElement.load();
+
+            // Establecer el póster
+            videoPlayerElement.poster = posterURL || '';
+
+            // Mostrar el reproductor de video
+            videoPlayerElement.classList.remove("hidden-video");
+        } else {
+            // Lógica para manejar el caso en el que falten parámetros de video o API key
+        }
+
+        // Obtén una referencia al elemento de selección de calidad
+        const qualitySelector = document.getElementById("quality");
+
+        // Agrega un evento para cambiar la calidad del video cuando se selecciona una opción
+        qualitySelector.addEventListener("change", function () {
+            const selectedQuality = qualitySelector.value;
+            // Cambia la fuente de video en función de la calidad seleccionada
+            if (selectedQuality === "high") {
+                videoPlayerElement.querySelector('source[type="video/mp4"]').src = videoURL + "&mimeType=video/mp4&codecs=avc1.42E01E,mp4a.40.2";
+            } else if (selectedQuality === "medium") {
+                videoPlayerElement.querySelector('source[type="video/mp4"]').src = videoURL + "&mimeType=video/mp4&codecs=avc1.42E01E,mp4a.40.2";
+            } else if (selectedQuality === "low") {
+                videoPlayerElement.querySelector('source[type="video/mp4"]').src = videoURL + "&mimeType=video/mp4&codecs=avc1.42E01E,mp4a.40.2";
+            }
+            // Carga el nuevo video
+            videoPlayerElement.load();
+        });
+    </script>
+</body>
+</html>
